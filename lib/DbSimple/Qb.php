@@ -69,14 +69,15 @@ class DbSimple_Qb
 			$this->data['select'] == false)
 			$this->data['select'] = '*';
 		
-		$q = $this->db->subquery('SELECT ?s
-			{FROM ?s}
-			{?s}
-			{WHERE ?s}
-			{GROUP BY ?s}
-			{HAVING ?s}
-			{ORDER BY ?s}
-			{LIMIT ?d, ?d}',
+		$q = $this->db->subquery(
+'SELECT ?s
+{FROM ?s}
+{?s}
+{WHERE ?s}
+{GROUP BY ?s}
+{HAVING ?s}
+{ORDER BY ?s}
+{LIMIT ?d, ?d}',
 		$this->data['select'],
 		$this->data['from'],
 		$this->data['join'],
