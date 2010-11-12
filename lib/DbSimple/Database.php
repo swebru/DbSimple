@@ -89,6 +89,17 @@ abstract class DbSimple_Database extends DbSimple_LastError
      */
 
     /**
+     * Возвращает новый построитель запросов
+     *
+     * @return DbSimple_Qb Построитель запросов
+     */
+    public function b()
+    {
+        require_once dirname(__FILE__).'/Qb.php';
+        return new DbSimple_Qb($this);
+    }
+
+    /**
      * object blob($blob_id)
      * Create new blob
      */
