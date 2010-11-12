@@ -27,6 +27,14 @@ class DbSimple_Qb
 		);
 	}
 
+    /**
+     * Написать вызовы построенного запроса - что-то типа
+     * ->get()->(select|select_row|select_col|select_cell|...)
+     *
+     * Возможно без этого get() тогда во что переименовать select
+     * или же select_all
+     */
+
 	/**
 	 * Врапер для формирование DbSimple_SubQuery из параметров функции
 	 *
@@ -50,7 +58,7 @@ class DbSimple_Qb
 
 	public function from($table)
 	{
-		$table = call_user_func_array(array($this->db, 'subquery'), func_get_args());
+		$table = $this->getSQ(func_get_args());
 		if (empty($this->data['from']))
 			$this->data['from'] = $table;
 		else
