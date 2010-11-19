@@ -22,7 +22,7 @@ class DbSimple_Qb
 			'group' => DBSIMPLE_SKIP,
 			'having' => DBSIMPLE_SKIP,
 			'order' => DBSIMPLE_SKIP,
-			'limit' => DBSIMPLE_SKIP,
+			'count' => DBSIMPLE_SKIP,
 			'offset' => DBSIMPLE_SKIP,
 		);
 	}
@@ -59,10 +59,45 @@ class DbSimple_Qb
 	public function from($table)
 	{
 		$table = $this->getSQ(func_get_args());
-		if (empty($this->data['from']))
+		if ($this->data['from'] === DBSIMPLE_SKIP)
 			$this->data['from'] = $table;
 		else
 			$this->data['from'] = $this->db->subquery('?s, ?s', $this->data['from'], $table);
+		return $this;
+	}
+
+	public function join($join)
+	{
+		$join = $this->getSQ(func_get_args());
+		if ($this->data['join'] === DBSIMPLE_SKIP)
+			$this->data['join'] = $join;
+		else
+			$this->data['join'] = $this->db->subquery('?s'."\n".'?s', $this->data['join'], $join);
+		return $this;
+	}
+
+	public function where($where)
+	{
+		$where = $this->getSQ(func_get_args());
+		if ($this->data['where'] === DBSIMPLE_SKIP)
+			$this->data['where'] = $where;
+		else
+			$this->data['where'] = $this->db->subquery('?s'."\n".'?s', $this->data['where'], $where);
+		return $this;
+	}
+
+	public function limit($offset, $count = false)
+	{
+		if ($count)
+		{
+			$this->data['offset'] = $offset;
+			$this->data['count'] = $count;
+		}
+		else
+		{
+			$this->data['offset'] = 0;
+			$this->data['count'] = $offset;
+		}
 		return $this;
 	}
 
@@ -73,9 +108,9 @@ class DbSimple_Qb
 	 */
 	public function get()
 	{
-		if ($this->data['from'] != DBSIMPLE_SKIP &&
-			$this->data['select'] == false)
-			$this->data['select'] = '*';
+		if ($this->data['from'] !== DBSIMPLE_SKIP &&
+			$this->data['select'] === false)
+			$this->data['select'] = $this->db->subquery('*');
 		
 		$q = $this->db->subquery(
 'SELECT ?s
@@ -93,7 +128,7 @@ class DbSimple_Qb
 		$this->data['group'],
 		$this->data['having'],
 		$this->data['order'],
-		$this->data['limit'], $this->data['offset']);
+		$this->data['offset'], $this->data['count']);
 		return $q;
 	}
 
