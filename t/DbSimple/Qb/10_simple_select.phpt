@@ -6,7 +6,7 @@ require_once dirname(__FILE__) . '/../init.php';
 
 function main(&$DB)
 {
-    $q = $DB->b()->select('1')->get();
+    $q = $DB->b()->fields('1')->get();
     printr($DB->select('?s', $q));
 }
 

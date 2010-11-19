@@ -15,7 +15,7 @@ class DbSimple_Qb
 	{
 		$this->db = &$db;
 		$this->data = array(
-			'select' => false,
+			'fields' => false,
 			'from' => DBSIMPLE_SKIP,
 			'join' => DBSIMPLE_SKIP,
 			'where' => DBSIMPLE_SKIP,
@@ -46,13 +46,13 @@ class DbSimple_Qb
 		return call_user_func_array(array($this->db, 'subquery'), $args);
 	}
 
-	public function select($fields)
+	public function fields($fields)
 	{
 		$sq = $this->getSQ(func_get_args());
-		if (empty($this->data['select']))
-			$this->data['select'] = $sq;
+		if (empty($this->data['fields']))
+			$this->data['fields'] = $sq;
 		else
-			$this->data['select'] = $this->db->subquery('?s, ?s', $this->data['select'], $sq);
+			$this->data['fields'] = $this->db->subquery('?s, ?s', $this->data['fields'], $sq);
 		return $this;
 	}
 
@@ -109,8 +109,8 @@ class DbSimple_Qb
 	public function get()
 	{
 		if ($this->data['from'] !== DBSIMPLE_SKIP &&
-			$this->data['select'] === false)
-			$this->data['select'] = $this->db->subquery('*');
+			$this->data['fields'] === false)
+			$this->data['fields'] = $this->db->subquery('*');
 		
 		$q = $this->db->subquery(
 'SELECT ?s
@@ -121,7 +121,7 @@ class DbSimple_Qb
 {HAVING ?s}
 {ORDER BY ?s}
 {LIMIT ?d, ?d}',
-		$this->data['select'],
+		$this->data['fields'],
 		$this->data['from'],
 		$this->data['join'],
 		$this->data['where'],
