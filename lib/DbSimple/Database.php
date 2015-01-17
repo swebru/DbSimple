@@ -236,6 +236,12 @@ abstract class DbSimple_Database extends DbSimple_LastError
      */
     public function escape($s, $isIdent=false)
     {
+        if(is_float($s)) {
+        // for mysql the point "." is the separator for the decimal point
+        // for example, as for "?f" placeholder
+            $s = str_replace(',', '.', $s);
+        }
+    
         return $this->_performEscape($s, $isIdent);
     }
 
