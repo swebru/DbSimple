@@ -244,7 +244,7 @@ abstract class DbSimple_Database extends DbSimple_LastError
         // for example, as for "?f" placeholder
             return str_replace(',', '.', $s);
         }
-    
+
         return $this->_performEscape($s, $isIdent);
     }
 
@@ -725,7 +725,7 @@ abstract class DbSimple_Database extends DbSimple_LastError
                 # Placeholder
                 (\?) ( [_dsafn&|\#]? )                           #2 #3
             )
-        }sx';
+        }sxS';
         $query = preg_replace_callback(
             $re,
             array(&$this, '_expandPlaceholdersCallback'),
