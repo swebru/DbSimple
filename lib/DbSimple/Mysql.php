@@ -32,6 +32,8 @@ class DbSimple_Mysql extends DbSimple_Database
      */
     function DbSimple_Mysql($dsn)
     {
+        if (is_string($dsn)) $dsn = $this->parseDSN($dsn);
+
         $connect = 'mysql_'.((isset($dsn['persist']) && $dsn['persist'])?'p':'').'connect';
         if (!is_callable($connect))
             return $this->_setLastError("-1", "MySQL extension is not loaded", $connect);
@@ -44,11 +46,19 @@ class DbSimple_Mysql extends DbSimple_Database
             unset($dsn['port']);
         }
 
-        $ok = $this->link = @call_user_func($connect,
+        $params = array(
             $str = $dsn['host'] . (empty($dsn['port'])? "" : ":".$dsn['port']),
             $dsn['user'] = empty($dsn['user'])?'':$dsn['user'],
             $dsn['pass'] = empty($dsn['pass'])?'':$dsn['pass'],
-            true
+            true,
+        );
+
+        if (isset($dsn['client_flags'])) {
+            $params[] = $dsn['client_flags'];
+        }
+
+        $ok = $this->link = @call_user_func_array($connect,
+            $params
         );
         $this->_resetLastError();
         if (!$ok)

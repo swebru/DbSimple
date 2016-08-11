@@ -32,6 +32,7 @@ class DbSimple_Mysqli extends DbSimple_Database
      */
     function DbSimple_Mysqli($dsn)
     {
+        if (is_string($dsn)) $dsn = $this->parseDSN($dsn);
         
         if (!is_callable("mysqli_connect"))
             return $this->_setLastError("-1", "MySQLi extension is not loaded", "mysqli_connect");
@@ -44,24 +45,34 @@ class DbSimple_Mysqli extends DbSimple_Database
             }
         }
 
+        if (!isset($dsn['client_flags'])) {
+            $dsn['client_flags'] = 0;
+        }
+        $this->link = mysqli_init();
+
         if ( isset($dsn['socket']) ) {
             // Socket connection
-            $this->link = mysqli_connect(
-                null                                         // host
+            mysqli_real_connect(
+                $this->link
+                ,null                                        // host
                 ,empty($dsn['user']) ? 'root' : $dsn['user'] // user
                 ,empty($dsn['pass']) ? '' : $dsn['pass']     // password
                 ,preg_replace('{^/}s', '', $dsn['path'])     // schema
                 ,null                                        // port
                 ,$dsn['socket']                              // socket
+                ,$dsn['client_flags']
             );
         } else if (isset($dsn['host']) ) {
             // Host connection
-            $this->link = mysqli_connect(
-                $dsn['host']
+            mysqli_real_connect(
+                $this->link
+                ,$dsn['host']
                 ,empty($dsn['user']) ? 'root' : $dsn['user']
                 ,empty($dsn['pass']) ? '' : $dsn['pass']
                 ,preg_replace('{^/}s', '', $dsn['path'])
                 ,empty($dsn['port']) ? null : $dsn['port']
+                ,''
+                ,$dsn['client_flags']
             );
         } else {
             return $this->_setDbError('mysqli_connect()');
@@ -182,7 +193,7 @@ class DbSimple_Mysqli extends DbSimple_Database
     protected function _performFetch($result)
     {
         $row = mysqli_fetch_assoc($result);
-        if (mysql_error()) return $this->_setDbError($this->_lastQuery);
+        if (mysqli_error($this->link)) return $this->_setDbError($this->_lastQuery);
         if ($row === false) return null;
         return $row;
     }
